@@ -1,0 +1,102 @@
+{% extends "layout.html" %}
+
+  {% block content %}
+
+  <!-- Wrap all page content here -->
+  <div id="interactions-wrapper">
+
+    <!-- Day + Add Day buttons -->
+    <div class="selection day-buttons">
+      <div class="btn-group">
+        <button type="button" data-toggle="dropdown" class="btn btn-primary dropdown-toggle">Day<span class="caret"></span></button>
+        <ul class="dropdown-menu" role="menu">
+          <li><a href='#'>1</a></li>
+        </ul>
+      </div>
+
+      <!-- Add day button -->
+       <button type="button" class="btn btn-default" id="add-day-button">+ Add Day</button>
+    </div>
+
+    <div id="selections-wrapper">
+       <!-- Hotel selection -->
+      <div class = "col-lg-3 selection">
+          <label class="selection-headers" id="hotel-header"><h4>Hotels</h4></label>
+          <select class="form-control selection-elements">
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+            <option>4</option>
+            <option>5</option>
+          </select>
+
+          <button class="btn btn-primary selection-elements selection-add">Add</button>
+       </div>
+
+       <!-- Things selection -->
+      <div class = "col-lg-3 selection">
+          <label class="selection-headers" id="things-header"><h4>Things to do</h4></label>
+            <select class="form-control selection-elements">
+              <option>1</option>
+              <option>2</option>
+              <option>3</option>
+              <option>4</option>
+              <option>5</option>
+            </select>
+
+          <button class="btn btn-primary selection-elements selection-add">Add</button>
+      </div>
+
+      <!-- Restaurants selection -->
+      <div class = "col-lg-3 selection">
+          <label class="selection-headers" id="restaurants-header"><h4>Restaurants</h4></label>
+          <select class="form-control selection-elements">
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+            <option>4</option>
+            <option>5</option>
+          </select>
+
+          <button class="btn btn-primary selection-elements selection-add">Add</button>
+      </div>
+
+    </div>
+    <!-- Close selections wrapper -->
+
+  </div>
+  <!-- End wrapping of page content -->
+
+    <!-- Script block -->
+    <script>
+      {% autoescape false %}
+
+        // Google Maps function
+        function initialize_gmaps() {
+
+          //  initialize new gmaps [lat,lng] object
+          var coords = new google.maps.LatLng();
+        }
+
+        // Function for adding days
+        var dropdownMenu = $(".dropdown-menu");
+        $(document).ready(function() {
+          var num_days = 1;
+          $("#add-day-button").click(function() {
+            dropdownMenu.append("<li><a href='#'>"+(dropdownMenu.find('li').length+1)+"</a></li>");
+          });
+          num_days++;
+
+        });
+        // END of $(document).ready(function()
+
+      {% endautoescape %}
+    </script>
+
+  {% endblock %}
+
+<!-- NOTES -->
+<!--
+1. When inline-blocking elements, make sure that they are not in divs, else apply the inline-block property to the divs or remove the divs
+2. In order for the number of days on the menu not to be reset, you store information on the database or in local storage.
+ -->

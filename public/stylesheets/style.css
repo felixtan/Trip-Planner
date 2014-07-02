@@ -1,8 +1,114 @@
+/* NAVBAR */
+.container {
+  margin-left: 25px;
+  margin-right: 25px;
+}
+
+/* GENERAL/BODY */
 body {
   padding: 50px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
-a {
-  color: #00B7FF;
+
+/* USEER INTERACTIONS/SELECTIONS */
+#interactions-wrapper {
+  margin: 25px 25px 25px 0px;
+}
+
+
+/* HOME PAGE BUTTONS*/
+.btn {
+  margin: 5px 5px;
+}
+
+.day-buttons {
+  padding-right: 15px;
+  float: left;
+}
+
+#add-day-button {
+  color: #000;
+  background-color: #FFF;
+}
+
+/* HOME PAGE SELECTION DROPDOWNS */
+.selection-headers {
+  display: block;
+}
+
+/* buttons and dropdow*/
+.selection {
+  display: inline-block;
+}
+
+.selection-elements {
+  display: inline-block;
+}
+
+.form-control {
+  width: 75%;
+}
+
+.selections-wrapper {
+  padding-left: 100px;
+}
+
+/* FOOTER */
+#footer {
+  margin-top: 25px;
+}
+
+
+
+
+
+
+
+/*.item  div {
+  display: inline;
+}*/
+
+/*.item div button {
+ width : 40%;
+ margin :0 5%;
+ float :right;
+}*/
+
+/*.form-control{
+ display: inline;
+ width: 45%;
+}*/
+
+/*.item {
+ width: 14%;
+ height: 30px;
+ display: inline;
+ float: right;
+ margin:1%;
+ padding: 0;
+}*/
+
+/*#page_control_panel {
+  float:right;
+}
+
+
+
+#disambiguation_list li {
+  display: block;
+  padding: 14px;
+}
+
+#disambiguation_list li:hover {
+  background-color: #ddd;
+}
+
+#disambiguation_list .excerpt_title {
+  font: bold 20px arial,sans-serif;
+}
+
+#disambiguation_list .excerpt_text {
+  color: #555;
+  font: normal 14px arial,sans-serif;
 }
