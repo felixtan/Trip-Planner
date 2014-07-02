@@ -3,21 +3,6 @@ var router = express.Router();
 var models = require('../models');
 
 /* GET home page. */
-// router.get('/', function(req, res) {
-//   models.Hotel.find(function(err, hotels) {
-//     models.Restaurants.find(function(err, restaurants) {
-//       models.ThingsToDo.find(function(err, things) {
-//         res.json({
-//           hotels: hotels,
-//           restaurants: restaurants,
-//           things: things
-//         });
-//       });
-//     });
-//     res.render('index', { hotels: hotels, title: "Trip Planner" });
-//   });
-// });
-
 router.get('/', [
   function(req, res, next) {
     models.Hotel.find(function(err, hotels) {
@@ -33,21 +18,16 @@ router.get('/', [
   },
   function(req, res, next) {
     models.ThingsToDo.find(function(err, things) {
-      res.json({
-          hotels: req.hotels,
-          restaurants: req.restaurants,
-          things: things
-      });
-      // res.render("index", {"object": res.json});
-      // res.render("index", {"hotels": res.json.hotels, "restaurants": res.json.restaurants, "things": res.json.things});
-      //res.render("index");
+      var locals = {"hotels": req.hotels, "restaurants": req.restaurants, "things": things };
+
+      res.render("index", locals);
     });
   }
  ]);
 
-/* Link to Home page */
+/* Home links to index */
 router.get('/home', function(req, res) {
-  res.render('home');
+  res.render('index');
 });
 
 /* Link to About page */

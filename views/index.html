@@ -1,18 +1,135 @@
 {% extends "layout.html" %}
 
-{% block content %}
-  <!-- <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAA3o_Ep67eBMhiUtx5sXAyjHimUQbZ9ec&sensor=true"></script> -->
-{% endblock %}
+  {% block content %}
 
-<!-- // <script>
-//   {% autoescape false %}
-//   var all_hotels = {{ hotels | json }};
-//   var all_restaurants = {{ restaurants | json }};
-//   var all_things_to_do = {{ things | json }};
-//   {% endautoescape %}
+  <!-- Wrap all page content here -->
+  <div id="interactions-wrapper">
 
-//   hotels.forEach(function(h) {
-//     $("hotel-select").append("<option>" + h.name + "</option>");
-//   });
+    <!-- Day + Add Day buttons -->
+    <div class="selection day-buttons">
+      <div class="btn-group">
+        <button type="button" data-toggle="dropdown" class="btn btn-primary dropdown-toggle">Day<span class="caret"></span></button>
+        <ul class="dropdown-menu" role="menu">
+          <li><a href='#'>1</a></li>
+        </ul>
+      </div>
 
-// </script> -->
+      <!-- Add day button -->
+       <button type="button" class="btn btn-default" id="add-day-button">+ Add Day</button>
+    </div>
+
+    <div id="selections-wrapper">
+
+       <!-- Hotel selection -->
+      <div class = "col-lg-3 selection">
+          <label class="selection-headers" id="hotel-header"><h4>Hotels</h4></label>
+          <select class="form-control selection-elements hotels-select">
+          </select>
+
+          <button class="btn btn-primary selection-elements selection-add">Add</button>
+       </div>
+
+       <!-- Things selection -->
+      <div class = "col-lg-3 selection">
+          <label class="selection-headers" id="things-header"><h4>Things to do</h4></label>
+            <select class="form-control selection-elements things-select">
+            </select>
+
+          <button class="btn btn-primary selection-elements selection-add">Add</button>
+      </div>
+
+      <!-- Restaurants selection -->
+      <div class = "col-lg-3 selection">
+          <label class="selection-headers" id="restaurants-header"><h4>Restaurants</h4></label>
+          <select class="form-control selection-elements restaurants-select">
+          </select>
+
+          <button class="btn btn-primary selection-elements selection-add">Add</button>
+      </div>
+
+    </div>
+    <!-- Close selections wrapper -->
+
+  </div>
+  <!-- End wrapping of user interactions -->
+
+  <div id="day-info">
+
+  </div>
+
+    <!-- Script block -->
+    <script>
+    {% autoescape false %}
+
+      // Google Maps function
+      function initialize_gmaps() {
+
+        //  initialize new gmaps [lat,lng] object
+        var coords = new google.maps.LatLng();
+      }
+
+      // POPULATE SELECTION LISTS
+      var all_hotels = {{ hotels | json }};
+      var all_restaurants = {{ restaurants | json }};
+      var all_things_to_do = {{ things | json }};
+
+      all_hotels.forEach(function(h) {
+        $(".hotels-select").append("<option>" + h.name + "</option>");
+      });
+
+      all_things_to_do.forEach(function(t) {
+        $(".things-select").append("<option>" + t.name + "</option>");
+      });
+
+      all_restaurants.forEach(function(r) {
+        $(".restaurants-select").append("<option>" + r.name + "</option>");
+      });
+      /////////////////////////////////
+
+      /* jQuery **********************************/
+
+      // dropdownMenu needed to increment days list
+      var dropdownMenu = $(".dropdown-menu");
+
+      // For each day, have an array of day-infos
+      var day_info = [];
+      var num_days;
+
+      $(document).ready(function() {
+
+        // Adding days and creating array of data_info objects
+        num_days = function() {
+          return dropdownMenu.find('li').length;
+        };
+
+        var day = {
+            id: num_days()
+          };
+
+        day_info.push(day);
+
+        $("#add-day-button").click(function() {
+          dropdownMenu.append("<li><a href='#'>"+(num_days())+"</a></li>");
+
+          day = {
+            id: num_days()
+          };
+
+          day_info.push(day);
+          console.log(day_info);
+        });
+
+      });
+      /* END of document.ready *******************/
+      /* END of jQuery ***************************/
+
+    {% endautoescape %}
+    </script>
+
+  {% endblock %}
+
+<!-- NOTES -->
+<!--
+1. When inline-blocking elements, make sure that they are not in divs, else apply the inline-block property to the divs or remove the divs
+2. In order for the number of days on the menu not to be reset, you store information on the database or in local storage.
+ -->
