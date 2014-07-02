@@ -98,16 +98,21 @@
       $(document).ready(function() {
 
         // Adding days and creating array of data_info objects
+
+        // function for getting the number of days which is equal to the number of list items
         num_days = function() {
           return dropdownMenu.find('li').length;
         };
 
+        /* Push the first day into th array */
         var day = {
             id: num_days()
           };
 
         day_info.push(day);
+        /************************************/
 
+        /* When the 'Add Day' button is clicked, add a new day, create a new day object, and push it into the day_nfo array */
         $("#add-day-button").click(function() {
           dropdownMenu.append("<li><a href='#'>"+(num_days())+"</a></li>");
 
@@ -118,6 +123,7 @@
           day_info.push(day);
           console.log(day_info);
         });
+        /*****************************************************/
 
       });
       /* END of document.ready *******************/
