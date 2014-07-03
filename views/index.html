@@ -8,10 +8,15 @@
     <!-- Day + Add Day buttons -->
     <div class="selection day-buttons">
       <div class="btn-group">
-        <button type="button" data-toggle="dropdown" class="btn btn-primary dropdown-toggle">Day<span class="caret"></span></button>
-        <ul class="dropdown-menu" role="menu">
+        <!-- <button type="button" data-toggle="dropdown" class="btn btn-primary dropdown-toggle">Day<span class="caret"></span></button> -->
+        <!-- <ul class="dropdown-menu day-dropdown" role="menu">
           <li><a href='#'>1</a></li>
-        </ul>
+          <li><option>1</option></li>
+        </ul> -->
+        <select class="form-control day-dropdown">
+          <option value="">Day</option>
+          <option>1</option>
+        </select>
       </div>
 
       <!-- Add day button -->
@@ -24,27 +29,30 @@
       <div class = "col-lg-3 selection">
           <label class="selection-headers" id="hotel-header"><h4>Hotels</h4></label>
           <select class="form-control selection-elements hotels-select">
+            <option value="">Select</option>
           </select>
 
-          <button class="btn btn-primary selection-elements selection-add">Add</button>
+          <button class="btn btn-primary selection-elements add-hotels">Add</button>
        </div>
 
        <!-- Things selection -->
       <div class = "col-lg-3 selection">
           <label class="selection-headers" id="things-header"><h4>Things to do</h4></label>
             <select class="form-control selection-elements things-select">
+              <option value="">Select</option>
             </select>
 
-          <button class="btn btn-primary selection-elements selection-add">Add</button>
+          <button class="btn btn-primary selection-elements add-things">Add</button>
       </div>
 
       <!-- Restaurants selection -->
       <div class = "col-lg-3 selection">
           <label class="selection-headers" id="restaurants-header"><h4>Restaurants</h4></label>
           <select class="form-control selection-elements restaurants-select">
+            <option value="">Select</option>
           </select>
 
-          <button class="btn btn-primary selection-elements selection-add">Add</button>
+          <button class="btn btn-primary selection-elements add-restaurants">Add</button>
       </div>
 
     </div>
@@ -53,8 +61,23 @@
   </div>
   <!-- End wrapping of user interactions -->
 
+  <!-- Day Info -->
   <div id="day-info">
+    <h4>Plan for Day <span id="current-day">1</span></h4>
+    <ul>
+      <li><h5>Hotel</h5></li>
+        <ul id="hotels-today" class="attractions">
 
+        </ul>
+      <li><h5>Things to Do</h5></li>
+        <ul id="things-today" class="attractions">
+
+        </ul>
+      <li><h5>Restaurants</h5></li>
+        <ul id="restaurants-today" class="attractions">
+
+        </ul>
+    </ul>
   </div>
 
     <!-- Script block -->
@@ -88,25 +111,29 @@
 
       /* jQuery **********************************/
 
-      // dropdownMenu needed to increment days list
-      var dropdownMenu = $(".dropdown-menu");
+      // day_dropdown needed to increment days list
+      // var day_dropdown = $(".dropdown-menu");
+      var day_dropdown = $(".day-dropdown");
 
       // For each day, have an array of day-infos
       var day_info = [];
       var num_days;
 
-      $(document).ready(function() {
+
 
         // Adding days and creating array of data_info objects
-
-        // function for getting the number of days which is equal to the number of list items
+        $(document).ready(function() {
+        /* function for getting the number of days which is equal to the number of list items */
         num_days = function() {
-          return dropdownMenu.find('li').length;
+          return day_dropdown.children().length-1;
         };
 
-        /* Push the first day into th array */
+        /* Push the first day into the array */
         var day = {
-            id: num_days()
+            id: num_days(),
+            hotels: [],
+            things: [],
+            restaurants: []
           };
 
         day_info.push(day);
@@ -114,18 +141,101 @@
 
         /* When the 'Add Day' button is clicked, add a new day, create a new day object, and push it into the day_nfo array */
         $("#add-day-button").click(function() {
-          dropdownMenu.append("<li><a href='#'>"+(num_days())+"</a></li>");
 
-          day = {
-            id: num_days()
-          };
+        /* Using add day dropdown ***************************/
+        day_dropdown.append("<option>"+(num_days()+1)+"</option>");
 
-          day_info.push(day);
-          console.log(day_info);
+        day = {
+          id: num_days(),
+          hotels: [],
+          things: [],
+          restaurants: []
+        };
+
+        day_info.push(day);
+        /****************************************************/
+
         });
-        /*****************************************************/
-
       });
+
+      /* Adding selected hotels, things, and restaurants to the day_info object */
+      $(".add-hotels").click(function() {
+        var selected = $(".hotels-select option:selected").text();
+        current_day_object().hotels.push(selected);
+        render_added();
+
+        console.log(current_day_object());
+      });
+
+      $(".add-things").click(function() {
+        var selected = $(".things-select option:selected").text();
+        current_day_object().things.push(selected);
+        render_added();
+        console.log(current_day_object());
+      });
+
+      $(".add-restaurants").click(function() {
+        var selected = $(".restaurants-select option:selected").text();
+        current_day_object().restaurants.push(selected);
+        render_added();
+        console.log(current_day_object());
+      });
+
+      // TODO: function to check if the hotel/thing/restaurant is already stored -> no duplicates?
+      /*******************************************************/
+
+      /* Render day info when day is selected ***************/
+        var current_day = function() {
+          return parseInt($(".day-dropdown option:selected").text());
+        };
+
+        // Dynamically render added stuff when add buttons are clicked
+        // TODO: fix repitions
+        var render_added = function() {
+
+          current_day_object().hotels.forEach(function(hotel) {
+            $("#hotels-today").append("<li>"+hotel+"</li>");
+          });
+          current_day_object().things.forEach(function(thing) {
+            $("#things-today").append("<li>"+thing+"</li>");
+          });
+          current_day_object().restaurants.forEach(function(restaurant) {
+            $("#restaurants-today").append("<li>"+restaurant+"</li>");
+          });
+        };
+
+        // Functions returns boolean value checking if hotels/things/restaurants ul already contains an item
+        var already_contains = function(ul, something) {
+          ul.forEach(function(li) {
+
+            // ul is an array of items enclosed in li tags
+            // ex. <li>Smyth Tribeca</li>
+            // item and something must be strings
+            if(item == something)
+              return true
+            else
+              return false
+          });
+        };
+
+        // Renders the day info day number
+        day_dropdown.change(function() {
+          $("#current-day").text(current_day().toString());
+
+          // TODO: Reset the day select to 'Day' after a day is selected
+        });
+
+        // select the appropriate day object
+        var current_day_object = function() {
+          for(var index in day_info) {
+            if(day_info[index].id === current_day())
+              return day_info[index];
+          }
+        };
+      /*****************************************************/
+
+      /*****************************************************/
+
       /* END of document.ready *******************/
       /* END of jQuery ***************************/
 

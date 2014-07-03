@@ -50,16 +50,24 @@ body {
   width: 75%;
 }
 
-.selections-wrapper {
+.day-dropdown {
+  width: 100%;
+}
 
+/* Day Info */
+#day-info {
+  clear: both;
+}
+
+.attractions {
+  list-style: none;
+  padding-left: 0;
 }
 
 /* FOOTER */
 #footer {
   margin-top: 25px;
 }
-
-
 
 
 
