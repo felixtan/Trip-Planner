@@ -161,24 +161,32 @@
       /* Adding selected hotels, things, and restaurants to the day_info object */
       $(".add-hotels").click(function() {
         var selected = $(".hotels-select option:selected").text();
-        current_day_object().hotels.push(selected);
-        render_added();
 
-        console.log(current_day_object());
+        if(already_contains(current_day_object().hotels, selected) == false) {
+          current_day_object().hotels.push(selected);
+          refresh_plans();
+          render_added();
+        }
       });
 
       $(".add-things").click(function() {
         var selected = $(".things-select option:selected").text();
-        current_day_object().things.push(selected);
-        render_added();
-        console.log(current_day_object());
+
+        if(already_contains(current_day_object().things, selected) == false) {
+          current_day_object().things.push(selected);
+          refresh_plans();
+          render_added();
+        }
       });
 
       $(".add-restaurants").click(function() {
         var selected = $(".restaurants-select option:selected").text();
-        current_day_object().restaurants.push(selected);
-        render_added();
-        console.log(current_day_object());
+
+        if(already_contains(current_day_object().restaurants, selected) == false) {
+          current_day_object().restaurants.push(selected);
+          refresh_plans();
+          render_added();
+        }
       });
 
       // TODO: function to check if the hotel/thing/restaurant is already stored -> no duplicates?
@@ -192,7 +200,6 @@
         // Dynamically render added stuff when add buttons are clicked
         // TODO: fix repitions
         var render_added = function() {
-
           current_day_object().hotels.forEach(function(hotel) {
             $("#hotels-today").append("<li>"+hotel+"</li>");
           });
@@ -205,17 +212,36 @@
         };
 
         // Functions returns boolean value checking if hotels/things/restaurants ul already contains an item
-        var already_contains = function(ul, something) {
-          ul.forEach(function(li) {
+        var already_contains = function(list, something) {
+          var already_contains_item;
+          var already_contains_item = false;
 
-            // ul is an array of items enclosed in li tags
-            // ex. <li>Smyth Tribeca</li>
-            // item and something must be strings
-            if(item == something)
-              return true
-            else
-              return false
-          });
+          if(list.length === 0) {
+            return already_contains_item;
+          }
+          else {
+            for(var item in list) {
+              // ul is an array of items enclosed in li tags
+              // ex. <li>Smyth Tribeca</li>
+              // item and something must be strings
+              if(list[item] == something)
+                already_contains_item = true;
+              else
+                already_contains_item = false;
+
+              if(already_contains_item == true)
+                break;
+            }
+
+            return already_contains_item;
+          }
+        };
+
+        // Function to refresh today's plans by clearing child nodes
+        var refresh_plans = function() {
+          $("#hotels-today").empty();
+          $("#things-today").empty();
+          $("#restaurants-today").empty();
         };
 
         // Renders the day info day number
