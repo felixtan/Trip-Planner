@@ -1,7 +1,15 @@
+* {
+  max-width: 100%;
+}
+
 /* NAVBAR */
 .container {
   margin-left: 25px;
   margin-right: 25px;
+}
+
+.navbar-brand {
+  display: inline-block;
 }
 
 /* GENERAL/BODY */
@@ -10,21 +18,24 @@ body {
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
-
 /* USEER INTERACTIONS/SELECTIONS */
 #interactions-wrapper {
   margin: 25px 25px 25px 0px;
+  display: block;
 }
 
 
-/* HOME PAGE BUTTONS*/
+/* DAY BUTTONS*/
 .btn {
   margin: 5px 5px;
 }
 
 .day-buttons {
+  display: inline-block;
+  position: relative;
+  bottom: 35px;
   padding-right: 15px;
-  float: left;
+  max-width: 25%;
 }
 
 #add-day-button {
@@ -37,9 +48,10 @@ body {
   display: block;
 }
 
-/* buttons and dropdow*/
+/* buttons and dropdown */
 .selection {
   display: inline-block;
+  width: 30%;
 }
 
 .selection-elements {
@@ -51,12 +63,22 @@ body {
 }
 
 .day-dropdown {
-  width: 100%;
+  width: 125%;
+}
+
+#selections-wrapper {
+  margin-bottom: 15px;
+ /* float: right;*/
+ display: inline-block;
 }
 
 /* Day Info */
 #day-info {
-  clear: both;
+  display: block;
+}
+
+#day-plan {
+  display: inline-block;
 }
 
 .attractions {
@@ -67,6 +89,15 @@ body {
 /* FOOTER */
 #footer {
   margin-top: 25px;
+}
+
+/* GMAPS */
+#map-canvas {
+  min-height: 66%;
+  min-width: 50%;
+  top: 210px;
+  right: 230px;
+  position: absolute;
 }
 
 

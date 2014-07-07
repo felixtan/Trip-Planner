@@ -2,11 +2,11 @@
 
   {% block content %}
 
-  <!-- Wrap all page content here -->
   <div id="interactions-wrapper">
 
     <!-- Day + Add Day buttons -->
     <div class="selection day-buttons">
+      <h4 class="selection-headers" id="day-header">Day</h4>
       <div class="btn-group">
         <!-- <button type="button" data-toggle="dropdown" class="btn btn-primary dropdown-toggle">Day<span class="caret"></span></button> -->
         <!-- <ul class="dropdown-menu day-dropdown" role="menu">
@@ -14,7 +14,7 @@
           <li><option>1</option></li>
         </ul> -->
         <select class="form-control day-dropdown">
-          <option value="">Day</option>
+          <!-- <option value="">Day</option> -->
           <option>1</option>
         </select>
       </div>
@@ -63,210 +63,271 @@
 
   <!-- Day Info -->
   <div id="day-info">
-    <h4>Plan for Day <span id="current-day">1</span></h4>
-    <ul>
-      <li><h5>Hotel</h5></li>
-        <ul id="hotels-today" class="attractions">
+    <div id="day-plan">
+      <h4>Plan for Day <span id="current-day">1</span></h4>
+      <ul>
+        <li><h5>Hotel</h5></li>
+          <ul id="hotels-today" class="attractions">
 
-        </ul>
-      <li><h5>Things to Do</h5></li>
-        <ul id="things-today" class="attractions">
+          </ul>
+        <li><h5>Things to Do</h5></li>
+          <ul id="things-today" class="attractions">
 
-        </ul>
-      <li><h5>Restaurants</h5></li>
-        <ul id="restaurants-today" class="attractions">
+          </ul>
+        <li><h5>Restaurants</h5></li>
+          <ul id="restaurants-today" class="attractions">
 
-        </ul>
-    </ul>
+          </ul>
+      </ul>
+    </div>
+
+      <!-- GMAPS div inside day-info div -->
+    <!-- <div id="map-canvas">
+
+    </div> -->
+    <!-- END GMAPS -->
   </div>
+  <!-- END day info -->
 
-    <!-- Script block -->
-    <script>
-    {% autoescape false %}
+  <!-- Script block -->
+  <script>
+  {% autoescape false %}
 
-      // Google Maps function
-      function initialize_gmaps() {
+    // POPULATE SELECTION LISTS
+    var all_hotels = {{ hotels | json }};
+    var all_restaurants = {{ restaurants | json }};
+    var all_things_to_do = {{ things | json }};
 
-        //  initialize new gmaps [lat,lng] object
-        var coords = new google.maps.LatLng();
+    all_hotels.forEach(function(h) {
+      $(".hotels-select").append("<option>" + h.name + "</option>");
+    });
+
+    all_things_to_do.forEach(function(t) {
+      $(".things-select").append("<option>" + t.name + "</option>");
+    });
+
+    all_restaurants.forEach(function(r) {
+      $(".restaurants-select").append("<option>" + r.name + "</option>");
+    });
+    /////////////////////////////////
+
+    /* jQuery **********************************/
+
+    // day_dropdown needed to increment days list
+    // var day_dropdown = $(".dropdown-menu");
+    var day_dropdown = $(".day-dropdown");
+
+    // For each day, have an array of day-infos
+    var day_info = [];
+    var num_days;
+
+
+
+    // Adding days and creating array of data_info objects
+    $(document).ready(function() {
+
+    /* Initialie Google maps */
+    // initialize_gmaps();
+
+    /* function for getting the number of days which is equal to the number of list items */
+    num_days = function() {
+      return day_dropdown.children().length;
+    };
+
+    /* Push the first day into the array */
+    var day = {
+        id: num_days(),
+        hotels: [],
+        things: [],
+        restaurants: []
+      };
+
+    day_info.push(day);
+    /************************************/
+
+    /* When the 'Add Day' button is clicked, add a new day, create a new day object, and push it into the day_nfo array */
+    $("#add-day-button").click(function() {
+
+    /* Using add day dropdown ***************************/
+    day_dropdown.append("<option>"+(num_days()+1)+"</option>");
+
+    day = {
+      id: num_days(),
+      hotels: [],
+      things: [],
+      restaurants: []
+    };
+
+    day_info.push(day);
+    /****************************************************/
+
+    render_day();
+    });
+  });
+
+    /* Adding selected hotels, things, and restaurants to the day_info object */
+    $(".add-hotels").click(function() {
+      var selected = $(".hotels-select option:selected").text();
+
+      /* Create object to post to the server */
+      var new_hotel = {
+        hotel: selected,
+        day: current_day()
+      };
+
+      if(already_contains(current_day_object().hotels, selected) == false) {
+        current_day_object().hotels.push(selected);
+        refresh_plans();
+        render_added();
       }
+    });
 
-      // POPULATE SELECTION LISTS
-      var all_hotels = {{ hotels | json }};
-      var all_restaurants = {{ restaurants | json }};
-      var all_things_to_do = {{ things | json }};
+    $(".add-things").click(function() {
+      var selected = $(".things-select option:selected").text();
 
-      all_hotels.forEach(function(h) {
-        $(".hotels-select").append("<option>" + h.name + "</option>");
-      });
+      if(already_contains(current_day_object().things, selected) == false) {
+        current_day_object().things.push(selected);
+        refresh_plans();
+        render_added();
+      }
+    });
 
-      all_things_to_do.forEach(function(t) {
-        $(".things-select").append("<option>" + t.name + "</option>");
-      });
+    $(".add-restaurants").click(function() {
+      var selected = $(".restaurants-select option:selected").text();
 
-      all_restaurants.forEach(function(r) {
-        $(".restaurants-select").append("<option>" + r.name + "</option>");
-      });
-      /////////////////////////////////
+      if(already_contains(current_day_object().restaurants, selected) == false) {
+        current_day_object().restaurants.push(selected);
+        refresh_plans();
+        render_added();
+      }
+    });
+    /* END ADD BUTTON FUNCTIONALITY *********************/
 
-      /* jQuery **********************************/
+    // TODO: function to check if the hotel/thing/restaurant is already stored -> no duplicates?
+    /*******************************************************/
 
-      // day_dropdown needed to increment days list
-      // var day_dropdown = $(".dropdown-menu");
-      var day_dropdown = $(".day-dropdown");
+    /* Render day info when day is selected ***************/
+      var current_day = function() {
+        return parseInt($(".day-dropdown option:selected").text());
+      };
 
-      // For each day, have an array of day-infos
-      var day_info = [];
-      var num_days;
-
-
-
-        // Adding days and creating array of data_info objects
-        $(document).ready(function() {
-        /* function for getting the number of days which is equal to the number of list items */
-        num_days = function() {
-          return day_dropdown.children().length-1;
-        };
-
-        /* Push the first day into the array */
-        var day = {
-            id: num_days(),
-            hotels: [],
-            things: [],
-            restaurants: []
-          };
-
-        day_info.push(day);
-        /************************************/
-
-        /* When the 'Add Day' button is clicked, add a new day, create a new day object, and push it into the day_nfo array */
-        $("#add-day-button").click(function() {
-
-        /* Using add day dropdown ***************************/
-        day_dropdown.append("<option>"+(num_days()+1)+"</option>");
-
-        day = {
-          id: num_days(),
-          hotels: [],
-          things: [],
-          restaurants: []
-        };
-
-        day_info.push(day);
-        /****************************************************/
-
+      // Dynamically render added stuff when add buttons are clicked
+      // TODO: fix repitions
+      var render_added = function() {
+        current_day_object().hotels.forEach(function(hotel) {
+          $("#hotels-today").append("<li>"+hotel+"</li>");
         });
-      });
+        current_day_object().things.forEach(function(thing) {
+          $("#things-today").append("<li>"+thing+"</li>");
+        });
+        current_day_object().restaurants.forEach(function(restaurant) {
+          $("#restaurants-today").append("<li>"+restaurant+"</li>");
+        });
+      };
 
-      /* Adding selected hotels, things, and restaurants to the day_info object */
-      $(".add-hotels").click(function() {
-        var selected = $(".hotels-select option:selected").text();
+      // Functions returns boolean value checking if hotels/things/restaurants ul already contains an item
+      var already_contains = function(list, something) {
+        var already_contains_item;
+        var already_contains_item = false;
 
-        if(already_contains(current_day_object().hotels, selected) == false) {
-          current_day_object().hotels.push(selected);
-          refresh_plans();
-          render_added();
+        if(list.length === 0) {
+          return already_contains_item;
         }
-      });
+        else {
+          for(var item in list) {
+            // ul is an array of items enclosed in li tags
+            // ex. <li>Smyth Tribeca</li>
+            // item and something must be strings
+            if(list[item] == something)
+              already_contains_item = true;
+            else
+              already_contains_item = false;
 
-      $(".add-things").click(function() {
-        var selected = $(".things-select option:selected").text();
-
-        if(already_contains(current_day_object().things, selected) == false) {
-          current_day_object().things.push(selected);
-          refresh_plans();
-          render_added();
-        }
-      });
-
-      $(".add-restaurants").click(function() {
-        var selected = $(".restaurants-select option:selected").text();
-
-        if(already_contains(current_day_object().restaurants, selected) == false) {
-          current_day_object().restaurants.push(selected);
-          refresh_plans();
-          render_added();
-        }
-      });
-
-      // TODO: function to check if the hotel/thing/restaurant is already stored -> no duplicates?
-      /*******************************************************/
-
-      /* Render day info when day is selected ***************/
-        var current_day = function() {
-          return parseInt($(".day-dropdown option:selected").text());
-        };
-
-        // Dynamically render added stuff when add buttons are clicked
-        // TODO: fix repitions
-        var render_added = function() {
-          current_day_object().hotels.forEach(function(hotel) {
-            $("#hotels-today").append("<li>"+hotel+"</li>");
-          });
-          current_day_object().things.forEach(function(thing) {
-            $("#things-today").append("<li>"+thing+"</li>");
-          });
-          current_day_object().restaurants.forEach(function(restaurant) {
-            $("#restaurants-today").append("<li>"+restaurant+"</li>");
-          });
-        };
-
-        // Functions returns boolean value checking if hotels/things/restaurants ul already contains an item
-        var already_contains = function(list, something) {
-          var already_contains_item;
-          var already_contains_item = false;
-
-          if(list.length === 0) {
-            return already_contains_item;
+            if(already_contains_item == true)
+              break;
           }
-          else {
-            for(var item in list) {
-              // ul is an array of items enclosed in li tags
-              // ex. <li>Smyth Tribeca</li>
-              // item and something must be strings
-              if(list[item] == something)
-                already_contains_item = true;
-              else
-                already_contains_item = false;
 
-              if(already_contains_item == true)
-                break;
-            }
+          return already_contains_item;
+        }
+      };
 
-            return already_contains_item;
-          }
-        };
+      // Function to refresh today's plans by clearing child nodes
+      var refresh_plans = function() {
+        $("#hotels-today").empty();
+        $("#things-today").empty();
+        $("#restaurants-today").empty();
+      };
 
-        // Function to refresh today's plans by clearing child nodes
-        var refresh_plans = function() {
-          $("#hotels-today").empty();
-          $("#things-today").empty();
-          $("#restaurants-today").empty();
-        };
-
-        // Renders the day info day number
+      // Renders the day info day number
+      var render_day = function() {
         day_dropdown.change(function() {
           $("#current-day").text(current_day().toString());
-
+          refresh_plans();
+          render_added();
           // TODO: Reset the day select to 'Day' after a day is selected
         });
+      };
+      render_day();
 
-        // select the appropriate day object
-        var current_day_object = function() {
-          for(var index in day_info) {
-            if(day_info[index].id === current_day())
-              return day_info[index];
-          }
-        };
-      /*****************************************************/
+      // select the appropriate day object
+      var current_day_object = function() {
+        for(var index in day_info) {
+          if(day_info[index].id === current_day())
+            return day_info[index];
+        }
+      };
+    /*****************************************************/
 
-      /*****************************************************/
+    /*****************************************************/
 
-      /* END of document.ready *******************/
-      /* END of jQuery ***************************/
+    /* END of document.ready *******************/
+    /* END of jQuery ***************************/
 
-    {% endautoescape %}
-    </script>
+    /* GMAPS ***********************************************/
+    var map = new GMaps({
+      div: "#map-canvas",
+      lat: 20,
+      lng: -20,
+      zoom: 10
+    });
+
+    map.addMarker({
+      lat: 39.302921,
+      lng: -75.739202,
+      title: "Some Place"
+    });
+  //   var initialize_gmaps = function() {
+
+  //   // initialize new google maps LatLng object
+  //   var myLatlng = new google.maps.LatLng(40.705786,-74.007672);
+
+  //   // set the map options hash
+  //   var mapOptions = {
+  //     center: myLatlng,
+  //     zoom: 16,
+  //     mapTypeId: google.maps.MapTypeId.ROADMAP
+  //   };
+
+  //   // get the maps div's HTML obj
+  //   var map_canvas_obj = document.getElementById("map-canvas");
+
+  //   // initialize a new Google Map with the options
+  //   map = new google.maps.Map(map_canvas_obj, mapOptions);
+
+  //   // Add the marker to the map
+  //   // var marker = new google.maps.Marker({
+  //   //   position: myLatlng,
+  //   //   title:"Hello World!"
+  //   // });
+
+  //   // Add the marker to the map by calling setMap()
+  //   // marker.setMap(map);
+  // }
+  // initialize_gmaps();
+  /* END GMAPS ***********************************************/
+
+  {% endautoescape %}
+  </script>
 
   {% endblock %}
 
